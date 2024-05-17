@@ -49,7 +49,6 @@ fn main() {
         if rl.is_key_down(raylib::consts::KeyboardKey::KEY_SPACE) {
             scramble = scramble_generator::generate();
 
-            // get every move in the scramble and put it into a Vec<String>
             mat = scrambler::generate_new_mat();
             let s_vec: Vec<String> = scramble.split(" ").map(|s| s.to_string()).collect();
             mat = scrambler::scramble(mat.clone(), s_vec);
