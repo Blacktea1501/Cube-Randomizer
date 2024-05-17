@@ -3,7 +3,7 @@ use rand;
 pub fn generate() -> String {
     let mut moves: Vec<&str> = vec!["F", "U", "R", "L", "B", "D"];
     let post_fix: Vec<&str> = vec!["'", "2", ""];
-    let number_of_moves = 20;
+    let number_of_moves = 15;
     let mut scramble = String::new();
 
     for _ in 0..number_of_moves {

@@ -1,104 +1,69 @@
 mod scramble_generator;
+mod scrambler;
 
 use raylib::prelude::*;
 
+fn draw_cube(d: &mut RaylibDrawHandle, mat: Vec<Vec<Vec<Color>>>, x: i32, y: i32) {
+    draw_face(d, mat[0].clone(), 150 + x, 100 + y); // white 0
+    draw_face(d, mat[1].clone(), 60  + x, 190 + y); // orange 1
+    draw_face(d, mat[2].clone(), 150 + x, 190 + y); // green 2
+    draw_face(d, mat[3].clone(), 240 + x, 190 + y); // red 3 
+    draw_face(d, mat[4].clone(), 330 + x, 190 + y); // blue 4
+    draw_face(d, mat[5].clone(), 150 + x, 280 + y); // yellow 5
+}
+
+fn draw_face(d: &mut RaylibDrawHandle, mat: Vec<Vec<Color>>, x: i32, y: i32) {
+    for i in 0..3 {
+        for j in 0..3 {
+            d.draw_rectangle(x + i * 30, y + j * 30, 25, 25, mat[j as usize][i as usize]);
+            // draw numbers on the rectangles
+            d.draw_text_ex(&d.get_font_default(), &format!("{},{}", i, j), Vector2::new(x as f32 + i as f32 * 30.0, y as f32 + j as f32 * 30.0), 10.0, 0.0, Color::BLACK);
+        }
+    }
+}
+
 fn main() {
-    let mut scramble = scramble_generator::generate();
 
     let (mut rl, thread) = raylib::init()
         .size(800, 450)
         .title("Scramble Generator")
         .build();
 
+
     // set the target FPS
-    rl.set_target_fps(144);
+    rl.set_target_fps(60);
+
+
 
     // loading the font
     let font = rl.load_font(&thread, "/usr/share/fonts/TTF/JetBrainsMonoNerdFont-Bold.ttf",).unwrap();
+    
+    let mut mat = scrambler::generate_new_mat();
+
+    let mut scramble = scramble_generator::generate();
+    let s_vec: Vec<String> = scramble.split(" ").map(|s| s.to_string()).collect();
+    mat = scrambler::scramble(mat.clone(), s_vec);
 
     // main loop
     while !rl.window_should_close() {
         if rl.is_key_down(raylib::consts::KeyboardKey::KEY_SPACE) {
             scramble = scramble_generator::generate();
+
+            // get every move in the scramble and put it into a Vec<String>
+            mat = scrambler::generate_new_mat();
+            let s_vec: Vec<String> = scramble.split(" ").map(|s| s.to_string()).collect();
+            mat = scrambler::scramble(mat.clone(), s_vec);
         }
 
         let mut d = rl.begin_drawing(&thread);
+
         d.clear_background(Color::BLACK);
         d.draw_text_ex( &font, "Scramble Generator", Vector2::new(10.0, 10.0), 20.0, 0.0, Color::WHITE);
         d.draw_text_ex( &font, &scramble, Vector2::new(10.0, 30.0), 20.0, 0.0, Color::WHITE);
 
-        d.draw_rectangle(150, 100, 25, 25, Color::WHITE);
-        d.draw_rectangle(150, 130, 25, 25, Color::WHITE);
-        d.draw_rectangle(150, 160, 25, 25, Color::WHITE);
 
-        d.draw_rectangle(180, 130, 25, 25, Color::WHITE);
-        d.draw_rectangle(180, 100, 25, 25, Color::WHITE);
-        d.draw_rectangle(180, 160, 25, 25, Color::WHITE);
+        draw_cube(&mut d, mat.clone(), 0, 0);
 
-        d.draw_rectangle(210, 100, 25, 25, Color::WHITE);
-        d.draw_rectangle(210, 130, 25, 25, Color::WHITE);
-        d.draw_rectangle(210, 160, 25, 25, Color::WHITE);
-
-        d.draw_rectangle(150, 190, 25, 25, Color::GREEN);
-        d.draw_rectangle(150, 220, 25, 25, Color::GREEN);
-        d.draw_rectangle(150, 250, 25, 25, Color::GREEN);
-        
-        d.draw_rectangle(180, 190, 25, 25, Color::GREEN);
-        d.draw_rectangle(180, 220, 25, 25, Color::GREEN);
-        d.draw_rectangle(180, 250, 25, 25, Color::GREEN);
-
-        d.draw_rectangle(210, 190, 25, 25, Color::GREEN);
-        d.draw_rectangle(210, 220, 25, 25, Color::GREEN);
-        d.draw_rectangle(210, 250, 25, 25, Color::GREEN);
-
-       d.draw_rectangle(150, 280, 25, 25, Color::YELLOW); 
-       d.draw_rectangle(150, 310, 25, 25, Color::YELLOW);
-       d.draw_rectangle(150, 340, 25, 25, Color::YELLOW);
-
-       d.draw_rectangle(180, 280, 25, 25, Color::YELLOW);
-       d.draw_rectangle(180, 310, 25, 25, Color::YELLOW);
-       d.draw_rectangle(180, 340, 25, 25, Color::YELLOW);
-       
-       d.draw_rectangle(210, 280, 25, 25, Color::YELLOW);
-       d.draw_rectangle(210, 310, 25, 25, Color::YELLOW);
-       d.draw_rectangle(210, 340, 25, 25, Color::YELLOW);
-
-       d.draw_rectangle(120, 190, 25, 25, Color::ORANGE);
-       d.draw_rectangle(120, 220, 25, 25, Color::ORANGE);
-       d.draw_rectangle(120, 250, 25, 25, Color::ORANGE);
-
-       d.draw_rectangle(90, 190, 25, 25, Color::ORANGE);
-       d.draw_rectangle(90, 220, 25, 25, Color::ORANGE);
-       d.draw_rectangle(90, 250, 25, 25, Color::ORANGE);
-
-       d.draw_rectangle(60, 190, 25, 25, Color::ORANGE);
-       d.draw_rectangle(60, 220, 25, 25, Color::ORANGE);
-       d.draw_rectangle(60, 250, 25, 25, Color::ORANGE);
-
-       d.draw_rectangle(240, 190, 25, 25, Color::RED);
-       d.draw_rectangle(240, 220, 25, 25, Color::RED);
-       d.draw_rectangle(240, 250, 25, 25, Color::RED);
-
-       d.draw_rectangle(270, 190, 25, 25, Color::RED);
-       d.draw_rectangle(270, 220, 25, 25, Color::RED);
-       d.draw_rectangle(270, 250, 25, 25, Color::RED);
-
-       d.draw_rectangle(300, 190, 25, 25, Color::RED);
-       d.draw_rectangle(300, 220, 25, 25, Color::RED);
-       d.draw_rectangle(300, 250, 25, 25, Color::RED);
-
-       d.draw_rectangle(330, 190, 25, 25, Color::BLUE);
-       d.draw_rectangle(330, 220, 25, 25, Color::BLUE);
-       d.draw_rectangle(330, 250, 25, 25, Color::BLUE);
-
-       d.draw_rectangle(360, 190, 25, 25, Color::BLUE);
-       d.draw_rectangle(360, 220, 25, 25, Color::BLUE);
-       d.draw_rectangle(360, 250, 25, 25, Color::BLUE);
-
-       d.draw_rectangle(390, 190, 25, 25, Color::BLUE);
-       d.draw_rectangle(390, 220, 25, 25, Color::BLUE);
-       d.draw_rectangle(390, 250, 25, 25, Color::BLUE);
-
-       d.draw_fps(720, 420); 
+        d.draw_fps(720, 420); 
     }
 }
