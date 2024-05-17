@@ -36,7 +36,7 @@ fn main() {
 
 
     // loading the font
-    let font = rl.load_font(&thread, "/usr/share/fonts/TTF/JetBrainsMonoNerdFont-Bold.ttf",).unwrap();
+    let font = rl.load_font(&thread, "./src/font/JetBrainsMonoNerdFontMono-Bold.ttf").unwrap();
     
     let mut mat = scrambler::generate_new_mat();
 
