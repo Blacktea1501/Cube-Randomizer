@@ -1,4 +1,4 @@
-use raylib::color::Color;
+use raylib::prelude::*;
 
 pub fn scramble(mat: Vec<Vec<Vec<Color>>>, scramble: Vec<String>) -> Vec<Vec<Vec<Color>>> {
     let mut new_mat = mat.clone();
@@ -28,70 +28,21 @@ pub fn scramble(mat: Vec<Vec<Vec<Color>>>, scramble: Vec<String>) -> Vec<Vec<Vec
     new_mat
 }
 
-pub fn rotate_face(mat: Vec<Vec<Vec<Color>>>, face: usize) -> Vec<Vec<Vec<Color>>> {
-    let mut new_mat = mat.clone();
-
-    // swap the corners of the face
-    new_mat[face][0][0] = mat[face][2][0];
-    new_mat[face][2][0] = mat[face][2][2];
-    new_mat[face][2][2] = mat[face][0][2];
-    new_mat[face][0][2] = mat[face][0][0];
-
-    // swap the edges of the face
-    new_mat[face][0][1] = mat[face][1][0];
-    new_mat[face][1][0] = mat[face][2][1];
-    new_mat[face][1][2] = mat[face][0][1];
-    new_mat[face][2][1] = mat[face][1][2];
-
-    return new_mat;
+pub fn draw_cube(d: &mut RaylibDrawHandle, mat: Vec<Vec<Vec<Color>>>, x: i32, y: i32) {
+    draw_face(d, mat[0].clone(), 150 + x, 100 + y); // white 0
+    draw_face(d, mat[1].clone(), 60  + x, 190 + y); // orange 1
+    draw_face(d, mat[2].clone(), 150 + x, 190 + y); // green 2
+    draw_face(d, mat[3].clone(), 240 + x, 190 + y); // red 3 
+    draw_face(d, mat[4].clone(), 330 + x, 190 + y); // blue 4
+    draw_face(d, mat[5].clone(), 150 + x, 280 + y); // yellow 5
 }
 
-pub fn rotate_face_prime(mat: Vec<Vec<Vec<Color>>>, face: usize) -> Vec<Vec<Vec<Color>>> {
-    let mut new_mat = mat.clone();
-
-    // swap the corners of the face
-    new_mat[face][0][0] = mat[face][0][2];
-    new_mat[face][0][2] = mat[face][2][2];
-    new_mat[face][2][2] = mat[face][2][0];
-    new_mat[face][2][0] = mat[face][0][0];
-
-    // swap the edges of the face
-    new_mat[face][0][1] = mat[face][1][2];
-    new_mat[face][1][2] = mat[face][2][1];
-    new_mat[face][1][0] = mat[face][0][1];
-    new_mat[face][2][1] = mat[face][1][0];
-
-    new_mat
-}
-
-pub fn rotate_u(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
-    // rotate the U face 90 degrees clockwise
-    let mut new_mat = rotate_face(mat.clone(), 0);
-
+fn draw_face(d: &mut RaylibDrawHandle, mat: Vec<Vec<Color>>, x: i32, y: i32) {
     for i in 0..3 {
-        new_mat[1][0][i] = mat[2][0][i];
-        new_mat[2][0][i] = mat[3][0][i];
-        new_mat[3][0][i] = mat[4][0][i];
-        new_mat[4][0][i] = mat[1][0][i];
+        for j in 0..3 {
+            d.draw_rectangle(x + i * 30, y + j * 30, 25, 25, mat[j as usize][i as usize]);
+        }
     }
-    new_mat
-}
-
-pub fn rotate_u_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
-    let mut new_mat = rotate_face_prime(mat.clone(), 0);
-
-    for i in 0..3 {
-        new_mat[1][0][i] = mat[4][0][i];
-        new_mat[2][0][i] = mat[1][0][i];
-        new_mat[3][0][i] = mat[2][0][i];
-        new_mat[4][0][i] = mat[3][0][i];
-    }
-
-    return new_mat;
-}
-
-pub fn rotate_u2(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
-    return rotate_u(rotate_u(mat));
 }
 
 pub fn generate_new_mat() -> Vec<Vec<Vec<Color>>> {
@@ -117,7 +68,74 @@ pub fn generate_new_mat() -> Vec<Vec<Vec<Color>>> {
     mat
 }
 
-pub fn rotate_f_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_face(mat: Vec<Vec<Vec<Color>>>, face: usize) -> Vec<Vec<Vec<Color>>> {
+    let mut new_mat = mat.clone();
+
+    // swap the corners of the face
+    new_mat[face][0][0] = mat[face][2][0];
+    new_mat[face][2][0] = mat[face][2][2];
+    new_mat[face][2][2] = mat[face][0][2];
+    new_mat[face][0][2] = mat[face][0][0];
+
+    // swap the edges of the face
+    new_mat[face][0][1] = mat[face][1][0];
+    new_mat[face][1][0] = mat[face][2][1];
+    new_mat[face][1][2] = mat[face][0][1];
+    new_mat[face][2][1] = mat[face][1][2];
+
+    return new_mat;
+}
+
+fn rotate_face_prime(mat: Vec<Vec<Vec<Color>>>, face: usize) -> Vec<Vec<Vec<Color>>> {
+    let mut new_mat = mat.clone();
+
+    // swap the corners of the face
+    new_mat[face][0][0] = mat[face][0][2];
+    new_mat[face][0][2] = mat[face][2][2];
+    new_mat[face][2][2] = mat[face][2][0];
+    new_mat[face][2][0] = mat[face][0][0];
+
+    // swap the edges of the face
+    new_mat[face][0][1] = mat[face][1][2];
+    new_mat[face][1][2] = mat[face][2][1];
+    new_mat[face][1][0] = mat[face][0][1];
+    new_mat[face][2][1] = mat[face][1][0];
+
+    new_mat
+}
+
+fn rotate_u(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+    // rotate the U face 90 degrees clockwise
+    let mut new_mat = rotate_face(mat.clone(), 0);
+
+    for i in 0..3 {
+        new_mat[1][0][i] = mat[2][0][i];
+        new_mat[2][0][i] = mat[3][0][i];
+        new_mat[3][0][i] = mat[4][0][i];
+        new_mat[4][0][i] = mat[1][0][i];
+    }
+    new_mat
+}
+
+fn rotate_u_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+    let mut new_mat = rotate_face_prime(mat.clone(), 0);
+
+    for i in 0..3 {
+        new_mat[1][0][i] = mat[4][0][i];
+        new_mat[2][0][i] = mat[1][0][i];
+        new_mat[3][0][i] = mat[2][0][i];
+        new_mat[4][0][i] = mat[3][0][i];
+    }
+
+    return new_mat;
+}
+
+fn rotate_u2(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+    return rotate_u(rotate_u(mat));
+}
+
+
+fn rotate_f_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     // rotate the green face 90 degrees counter clockwise
     let mut new_mat = rotate_face_prime(mat.clone(), 2);
 
@@ -130,7 +148,7 @@ pub fn rotate_f_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     new_mat
 }
 
-pub fn rotate_f(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_f(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     // rotate the green face 90 degrees clockwise
     let mut new_mat = rotate_face(mat.clone(), 2);
 
@@ -144,11 +162,11 @@ pub fn rotate_f(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     new_mat
 }
 
-pub fn rotate_f2(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_f2(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     return rotate_f(rotate_f(mat));
 }
 
-pub fn rotate_r(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_r(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     // rotate the red face 90 degrees clockwise
     let mut new_mat = rotate_face(mat.clone(), 3);
 
@@ -162,7 +180,7 @@ pub fn rotate_r(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     new_mat
 }
 
-pub fn rotate_r_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_r_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     // rotate the red face 90 degrees counter clockwise
     let mut new_mat = rotate_face_prime(mat.clone(), 3);
 
@@ -176,11 +194,11 @@ pub fn rotate_r_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     new_mat
 }
 
-pub fn rotate_r2(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_r2(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     return rotate_r(rotate_r(mat));
 }
 
-pub fn rotate_l(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_l(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     // rotate the orange face 90 degrees clockwise
     let mut new_mat = rotate_face(mat.clone(), 1);
 
@@ -194,7 +212,7 @@ pub fn rotate_l(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     new_mat
 }
 
-pub fn rotate_l_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_l_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     // rotate the orange face 90 degrees counter clockwise
     let mut new_mat = rotate_face_prime(mat.clone(), 1);
 
@@ -208,11 +226,11 @@ pub fn rotate_l_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     new_mat
 }
 
-pub fn rotate_l2(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_l2(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     return rotate_l(rotate_l(mat));
 }
 
-pub fn rotate_d(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_d(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     // rotate the D face 90 degrees clockwise
     let mut new_mat = rotate_face(mat.clone(), 5);
 
@@ -226,7 +244,7 @@ pub fn rotate_d(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     new_mat
 }
 
-pub fn rotate_d_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_d_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     // rotate the D face 90 degrees counter clockwise
     let mut new_mat = rotate_face_prime(mat.clone(), 5);
 
@@ -240,11 +258,11 @@ pub fn rotate_d_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     new_mat
 }
 
-pub fn rotate_d2(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_d2(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     return rotate_d(rotate_d(mat));
 }
 
-pub fn rotate_b(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_b(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     // rotate the blue face 90 degrees clockwise
     let mut new_mat = rotate_face(mat.clone(), 4);
 
@@ -258,7 +276,7 @@ pub fn rotate_b(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     new_mat
 }
 
-pub fn rotate_b_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_b_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     // rotate the blue face 90 degrees counter clockwise
     let mut new_mat = rotate_face_prime(mat.clone(), 4);
 
@@ -272,6 +290,6 @@ pub fn rotate_b_prime(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     new_mat
 }
 
-pub fn rotate_b2(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
+fn rotate_b2(mat: Vec<Vec<Vec<Color>>>) -> Vec<Vec<Vec<Color>>> {
     return rotate_b(rotate_b(mat));
 }
