@@ -29,12 +29,12 @@ pub fn scramble(mat: Vec<Vec<Vec<Color>>>, scramble: Vec<String>) -> Vec<Vec<Vec
 }
 
 pub fn draw_cube(d: &mut RaylibDrawHandle, mat: Vec<Vec<Vec<Color>>>, x: i32, y: i32) {
-    draw_face(d, mat[0].clone(), 150 + x, 100 + y); // white 0
-    draw_face(d, mat[1].clone(), 60  + x, 190 + y); // orange 1
+    draw_face(d, mat[0].clone(), 150 + x, 95 + y); // white 0
+    draw_face(d, mat[1].clone(), 55  + x, 190 + y); // orange 1
     draw_face(d, mat[2].clone(), 150 + x, 190 + y); // green 2
-    draw_face(d, mat[3].clone(), 240 + x, 190 + y); // red 3 
-    draw_face(d, mat[4].clone(), 330 + x, 190 + y); // blue 4
-    draw_face(d, mat[5].clone(), 150 + x, 280 + y); // yellow 5
+    draw_face(d, mat[3].clone(), 245 + x, 190 + y); // red 3 
+    draw_face(d, mat[4].clone(), 340 + x, 190 + y); // blue 4
+    draw_face(d, mat[5].clone(), 150 + x, 285 + y); // yellow 5
 }
 
 fn draw_face(d: &mut RaylibDrawHandle, mat: Vec<Vec<Color>>, x: i32, y: i32) {
