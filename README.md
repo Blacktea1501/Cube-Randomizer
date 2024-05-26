@@ -17,3 +17,6 @@ This might be changed in the future and i will add an installation skript.
 | Space         | Start the inspection timer \ Stops the stopwatch |
 | hold Space    | Get ready during inspection                      |
 | release SPACE | start the timer                                  |
+
+# Screenshot
+![Screenshot](img/screenshot.png)
