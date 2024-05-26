@@ -11,7 +11,6 @@ fn main() {
         .build();
 
     // set the target FPS
-    //rl.set_target_fps(60);
     let font = rl.load_font(&thread, "./src/font/JetBrainsMonoNerdFontMono-Bold.ttf").unwrap();
     
     // initial scramble
@@ -111,7 +110,6 @@ fn main() {
 
         scrambler::draw_cube(&mut d, mat.clone(), 0, 0);
 
-        d.draw_fps(720, 420); 
     }
 }
 
