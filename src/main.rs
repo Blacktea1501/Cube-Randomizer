@@ -39,8 +39,7 @@ fn main() {
     // main loop
     while !rl.window_should_close() {
 
-        // check if the 
-        if rl.is_key_pressed(raylib::consts::KeyboardKey::KEY_ENTER) {
+        if rl.is_key_pressed(raylib::consts::KeyboardKey::KEY_ENTER) && !is_stopwatch {
             scramble = scramble_generator::generate();
             mat = scrambler::scramble(&scramble);
         }
