@@ -1,5 +1,6 @@
 mod scramble_generator;
 mod scrambler;
+mod save;
 
 use raylib::prelude::*;
 use std::time::Instant;
@@ -28,7 +29,12 @@ fn main() {
     // stopwatch
     let mut is_stopwatch: bool = false;
     let mut stopwatch_timer: Instant = Instant::now();
-    let mut stopwatch_time = 0.0;
+    let mut stopwatch_time = save::get_last();
+
+    let mut avg5 = save::get_avg(5); 
+    let mut avg12 = save::get_avg(12);
+    let mut avg100 = save::get_avg(100);
+    let mut pb = save::get_pb();
 
     // main loop
     while !rl.window_should_close() {
@@ -47,10 +53,15 @@ fn main() {
         
 
         let mut d = rl.begin_drawing(&thread);
+
     
         d.clear_background(Color::BLACK);
         d.draw_text_ex( &font, "Scramble Generator", Vector2::new(10.0, 10.0), 20.0, 0.0, Color::WHITE);
         d.draw_text_ex( &font, &scramble, Vector2::new(10.0, 30.0), 20.0, 0.0, Color::WHITE);
+        d.draw_text_ex( &font, format!("PB   :\t{}", &pb).as_str(), Vector2::new(680.0, 10.0), 20.0, 0.0, Color::WHITE);
+        d.draw_text_ex( &font, format!("Ao5  :\t{}", &avg5).as_str(), Vector2::new(680.0, 30.0), 20.0, 0.0, Color::WHITE);
+        d.draw_text_ex( &font, format!("Ao12 :\t{}", &avg12).as_str(), Vector2::new(680.0, 50.0), 20.0, 0.0, Color::WHITE);
+        d.draw_text_ex( &font, format!("Ao100:\t{}", &avg100).as_str(), Vector2::new(680.0, 70.0), 20.0, 0.0, Color::WHITE);
 
         if start {
             let elapsed = timer.elapsed().as_secs();
@@ -101,6 +112,13 @@ fn main() {
             if d.is_key_down(raylib::consts::KeyboardKey::KEY_SPACE) {
                 is_stopwatch = false;
                 stopwatch_time = elapsed;
+                save::save_data(&scramble, elapsed);
+                avg5 = save::get_avg(5);
+                avg12 = save::get_avg(12);
+                avg100 = save::get_avg(100);
+                pb = save::get_pb();
+                scramble = scramble_generator::generate();
+                mat = scrambler::scramble(&scramble);
             }
         }
         
