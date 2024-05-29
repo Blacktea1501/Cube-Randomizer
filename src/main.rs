@@ -17,13 +17,13 @@ fn main() {
     // initial scramble
     let mut scramble = scramble_generator::generate();
     let mut mat = scrambler::scramble(&scramble);
-
+    
 
     // inspection timer
     let mut start: bool = false;
     let mut timer: Instant = Instant::now();
     let mut greentimer: Instant = Instant::now();
-    let mut timer_started = false;
+    let mut is_inspection = false;
     let mut was_green = false;
 
     // stopwatch
@@ -31,23 +31,27 @@ fn main() {
     let mut stopwatch_timer: Instant = Instant::now();
     let mut stopwatch_time = save::get_last();
 
+    let mut is_locked = false;
+    let mut last_five = save::get_last_five();
     let mut avg5 = save::get_avg(5); 
     let mut avg12 = save::get_avg(12);
     let mut avg100 = save::get_avg(100);
     let mut pb = save::get_pb();
 
+
     // main loop
     while !rl.window_should_close() {
 
-        if rl.is_key_pressed(raylib::consts::KeyboardKey::KEY_ENTER) && !is_stopwatch {
+        if rl.is_key_pressed(raylib::consts::KeyboardKey::KEY_ENTER) && !is_locked {
             scramble = scramble_generator::generate();
             mat = scrambler::scramble(&scramble);
         }
         
-        if rl.is_key_pressed(raylib::consts::KeyboardKey::KEY_SPACE) && !start && !is_stopwatch{
+        if rl.is_key_pressed(raylib::consts::KeyboardKey::KEY_SPACE) && !start && !is_stopwatch {
             start = true;
             timer = Instant::now();
-            timer_started = true;
+            is_inspection = true;
+            is_locked = true;
         }
         
 
@@ -61,13 +65,16 @@ fn main() {
         d.draw_text_ex( &font, format!("Ao5  :\t{}", &avg5).as_str(), Vector2::new(680.0, 30.0), 20.0, 0.0, Color::WHITE);
         d.draw_text_ex( &font, format!("Ao12 :\t{}", &avg12).as_str(), Vector2::new(680.0, 50.0), 20.0, 0.0, Color::WHITE);
         d.draw_text_ex( &font, format!("Ao100:\t{}", &avg100).as_str(), Vector2::new(680.0, 70.0), 20.0, 0.0, Color::WHITE);
+        d.draw_text_ex( &font, format!("{}", &last_five).as_str(), Vector2::new(20.0, 420.0), 20.0, 0.0, Color::WHITE);
 
+        scrambler::draw_cube(&mut d, mat.clone(), 0, 0);
+        
         if start {
             let elapsed = timer.elapsed().as_secs();
 
             if elapsed >= 15{
                 start = false;
-                timer_started = false;
+                is_inspection = false;
             } 
 
             let countdown = 15 - elapsed;
@@ -75,9 +82,9 @@ fn main() {
             // if space is hold change the color of the text to red else it's white and if the
             // space bar is hold for more then one second the text will go green
             if d.is_key_down(raylib::consts::KeyboardKey::KEY_SPACE) {
-                if timer_started == true{
+                if is_inspection == true{
                     greentimer = Instant::now();
-                    timer_started = false;
+                    is_inspection = false;
                 }
                 if greentimer.elapsed().as_secs() >= 1 {
                     d.draw_text_ex( &font, &countdown.to_string(), Vector2::new(600.0, 225.0), 50.0, 0.0, Color::GREEN);
@@ -92,7 +99,7 @@ fn main() {
            // if the spacebar is released and the text was green then the timer will stop
            if d.is_key_up(raylib::consts::KeyboardKey::KEY_SPACE) && was_green {
                start = false;
-               timer_started = false;
+               is_inspection = false;
                was_green = false;
                is_stopwatch = true;
                stopwatch_timer = Instant::now();
@@ -100,7 +107,7 @@ fn main() {
            
            // this will reset the timer if the spacebar is released and the text was not green
            if d.is_key_up(raylib::consts::KeyboardKey::KEY_SPACE) && !was_green {
-               timer_started = true;
+               is_inspection = true;
            }
         }
         
@@ -116,8 +123,10 @@ fn main() {
                 avg12 = save::get_avg(12);
                 avg100 = save::get_avg(100);
                 pb = save::get_pb();
+                last_five = save::get_last_five();
                 scramble = scramble_generator::generate();
                 mat = scrambler::scramble(&scramble);
+                is_locked = false;
             }
         }
         
@@ -125,7 +134,6 @@ fn main() {
             d.draw_text_ex( &font, &stopwatch_time.to_string(), Vector2::new(600.0, 225.0), 50.0, 0.0, Color::WHITE);
         }
 
-        scrambler::draw_cube(&mut d, mat.clone(), 0, 0);
 
     }
 }

@@ -3,20 +3,8 @@ use std::io::{Read, Write};
 
 // method that calculates the average of the last 5 solves
 pub fn get_avg(n: usize) -> f64 {
-
-    // try to open the file
-    let mut file = match OpenOptions::new().read(true).open("./src/saves/scrambles.csv") {
-        Ok(file) => file,
-        Err(_) => return 0.0,
-    }; 
-
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
+    let times = read_times();
     
-    // collect the times from the file into a vector of f64
-    let times: Vec<f64> = contents.lines().map(|x| x.split(",").collect::<Vec<&str>>()[1].parse::<f64>().unwrap()).collect();
-
-    // if there are less then n solves return 0.0 
     if times.len() < n {
         return 0.0;
     }
@@ -32,50 +20,64 @@ pub fn get_avg(n: usize) -> f64 {
     ((last_five.iter().sum::<f64>() / (n - 2) as f64) * 1000.0).round() / 1000.0
 }
 
-pub fn get_pb() -> f64 {
-    // try to open the file
-    let mut file = match OpenOptions::new().read(true).open("./src/saves/scrambles.csv") {
-        Ok(file) => file,
-        Err(_) => return 0.0,
-    }; 
-
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
+pub fn get_last_five() -> String {
+    let times = read_times();
     
-    // collect the times from the file into a vector of f64
-    let times: Vec<f64> = contents.lines().map(|x| x.split(",").collect::<Vec<&str>>()[1].parse::<f64>().unwrap()).collect();
-
-    // if there are less then n solves return 0.0 
     if times.len() == 0 {
-        return 0.0;
+        return String::new();
     }
 
-    let x = times.iter().min_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
-    x.clone()
+    let mut result = String::new();
+
+    let numbers: Vec<f64>= match times.len() < 5 {
+        true => times.iter().map(|x| *x).collect(),
+        _ => times.iter().rev().take(5).map(|x| *x).collect()
+    };
+
+    let best = numbers.iter().min_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+    let worst = numbers.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+
+    for i in 0..numbers.len() {
+        match numbers[i] == *best || numbers[i] == *worst {
+            true => result.push_str(&format!("({})", numbers[i])),
+            _ =>  result.push_str(&format!("{}", numbers[i])),
+        }
+        result.push_str(" ");
+    }
+
+    result
+
+}
+
+
+pub fn get_pb() -> f64 {
+    let times = read_times();
+    match times.len() {
+        0 => return 0.0,
+        _ => return *times.iter().min_by(|a, b| a.partial_cmp(b).unwrap()).unwrap(),
+    }
 }
 
 pub fn get_last() -> f64 {
+    let times = read_times();
+    match times.len() {
+        0 => return 0.0,
+        _ => return *times.iter().last().unwrap()
+    }
+}
+
+fn read_times() ->  Vec<f64> {
     // try to open the file
     let mut file = match OpenOptions::new().read(true).open("./src/saves/scrambles.csv") {
         Ok(file) => file,
-        Err(_) => return 0.0,
+        Err(_) => return Vec::new(),
     }; 
-
+    
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
-    
-    // collect the times from the file into a vector of f64
-    let times: Vec<f64> = contents.lines().map(|x| x.split(",").collect::<Vec<&str>>()[1].parse::<f64>().unwrap()).collect();
 
-    // if there are less then n solves return 0.0 
-    if times.len() == 0 {
-        return 0.0;
-    }
-
-    let x = times.iter().last().unwrap();
-    x.clone()
+    contents.lines().map(|x| x.split(",").collect::<Vec<&str>>()[1].parse::<f64>().unwrap()).collect()
 }
-
 
 pub fn save_data(scramble: &str, time: f64) {
     // try to open the file, if it doesn't exist create it saves/scrambles.txt
