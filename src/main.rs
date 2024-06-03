@@ -53,6 +53,10 @@ fn main() {
             is_inspection = true;
             is_locked = true;
         }
+    
+        if rl.is_key_pressed(raylib::consts::KeyboardKey::KEY_P) {
+            start = false;
+        }
         
 
         let mut d = rl.begin_drawing(&thread);

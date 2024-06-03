@@ -13,6 +13,7 @@ This might be changed in the future and i will add an installation skript.
 | Key           |                       Action                     |
 |---------------|--------------------------------------------------|
 | ESC           | Quit the Program                                 |
+| P             | Interupt the inspection timer                    |
 | Return        | Generate new Scramble                            |
 | Space         | Start the inspection timer \ Stops the stopwatch |
 | hold Space    | Get ready during inspection                      |
