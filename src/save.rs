@@ -1,4 +1,4 @@
-use std::fs::OpenOptions;
+use std::fs::{OpenOptions, create_dir_all};
 use std::io::{Read, Write};
 
 // method that calculates the average of the last 5 solves
@@ -80,6 +80,9 @@ fn read_times() ->  Vec<f64> {
 }
 
 pub fn save_data(scramble: &str, time: f64) {
+    // create the directory if it doesn't exist
+    create_dir_all("./src/saves").unwrap();
+
     // try to open the file, if it doesn't exist create it saves/scrambles.txt
     let mut file = OpenOptions::new()
         .write(true)
