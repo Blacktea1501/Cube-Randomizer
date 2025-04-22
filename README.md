@@ -1,7 +1,7 @@
 # Rubik's Cube Randomizer
 This is a project that i thought would be fun to create.
 It's written in Rust `1.78.0` and depends on `rand` crate for random number generation
-and `raylibrs 3.7` for the GUI.
+and `raylibrs 5.0` for the GUI.
 
 # Compile and run
 Clone the repository, cd into the project and run:
