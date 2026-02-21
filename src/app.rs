@@ -129,10 +129,6 @@ impl App {
            
            // If space released and was green -> Start Timer
            if rl.is_key_up(raylib::consts::KeyboardKey::KEY_SPACE) && self.was_green {
-                // If DNF, logic might vary. If user starts timer at DNF, the solve is DNF?
-                // Or maybe prevent starting? Typically you can start, but it's DNF regardless of time.
-                // We will just let them run it and mark as DNF at end.
-               
                self.start = false;
                self.is_inspection = false;
                self.was_green = false;

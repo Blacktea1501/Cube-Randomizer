@@ -3,7 +3,6 @@ mod scrambler;
 mod history;
 mod app;
 
-use raylib::prelude::*;
 use app::App;
 
 fn main() {
